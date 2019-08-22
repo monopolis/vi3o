@@ -31,13 +31,11 @@ SETUP_REQUIRES = [
 ]
 
 EXTRAS_REQUIRE = {
-    "docs": [
-        "sphinx"
-    ],
-    "tests": [
+    "dev": [
         "coverage",
         "pytest <= 4.6, != 4.6.0",
-        "pillow < 7"
+        "pillow < 7",
+        "sphinx < 1.8",
     ],
     "full": [
         "pillow < 7",
@@ -46,13 +44,8 @@ EXTRAS_REQUIRE = {
 }
 
 if is_PY2:
-    EXTRAS_REQUIRE['tests'].append('mock')
+    EXTRAS_REQUIRE['dev'].append('mock')
 
-EXTRAS_REQUIRE['dev'] = (
-    EXTRAS_REQUIRE['tests'] + 
-    EXTRAS_REQUIRE['docs'] +
-    EXTRAS_REQUIRE['full']
-)
 
 PACKAGES = find_packages(where="src")
 
