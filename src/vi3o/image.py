@@ -22,12 +22,13 @@ def imsave(img, filename, format=None):
     # Be compatible with pathlib.Path filenames
     filename = str(filename)
     if format is None:
-        format = filename.split('.')[-1]
-    if format == 'jpg':
-        format = 'jpeg'
-    if img.dtype != 'B':
-        img = np.minimum(np.maximum(img, 0), 255).astype('B')
+        format = filename.split(".")[-1]
+    if format == "jpg":
+        format = "jpeg"
+    if img.dtype != "B":
+        img = np.minimum(np.maximum(img, 0), 255).astype("B")
     PIL.Image.fromarray(img).save(filename, format.lower())
+
 
 def imsavesc(img, filename, format=None):
     """
@@ -36,7 +37,10 @@ def imsavesc(img, filename, format=None):
     """
     imsave(ptpscale(img), filename, format)
 
-class Silent: pass
+
+class Silent:
+    pass
+
 
 def imread(filename, repair=False):
     """
@@ -45,7 +49,7 @@ def imread(filename, repair=False):
     to standard output unless *repair* is set to :class:`vi3o.image.Silent`.
     """
     # Be compatible with pathlib.Path filenames
-    a =  PIL.Image.open(str(filename))
+    a = PIL.Image.open(str(filename))
     try:
         a.load()
     except IOError as e:
@@ -67,10 +71,14 @@ def imscale(img, size, interpolation=NEAREST):
     size = map(int, size)
     return np.array(PIL.Image.fromarray(img).resize(size, interpolation))
 
+
 def imrotate(img, angle, center=None, size=None, interpolation=NEAREST, point=None):
     return imrotate_and_scale(img, angle, 1.0, center, size, interpolation, point)
 
-def imrotate_and_scale(img, angle, scale, center=None, size=None, interpolation=NEAREST, point=None):
+
+def imrotate_and_scale(
+    img, angle, scale, center=None, size=None, interpolation=NEAREST, point=None
+):
     """
     Rotate the image, *img*, *angle* radians around the point *center* which defaults to
     the center of the image. The output image size is specified in *size* as *(width, height)*.
@@ -81,26 +89,30 @@ def imrotate_and_scale(img, angle, scale, center=None, size=None, interpolation=
     """
     if center is None:
         h, w = img.shape[:2]
-        center = (w/2, h/2)
+        center = (w / 2, h / 2)
     if size is None:
         h, w = img.shape[:2]
         size = (w, h)
     else:
         size = tuple(size)
     cx, cy = size[0] / 2, size[1] / 2
-    s, c = np.sin(angle),  np.cos(angle)
-    data = [c, -s, -c*cx + s*cy + center[0],
-            s,  c, -s*cx - c*cy + center[1]]
-    data = [scale*d for d in data]
-    data[2] += (1-scale) * center[0]
-    data[5] += (1-scale) * center[1]
+    s, c = np.sin(angle), np.cos(angle)
+    data = [c, -s, -c * cx + s * cy + center[0], s, c, -s * cx - c * cy + center[1]]
+    data = [scale * d for d in data]
+    data[2] += (1 - scale) * center[0]
+    data[5] += (1 - scale) * center[1]
     if point is not None:
-        a, b, c, d, e, f, _, _, _ = np.linalg.inv(np.vstack((np.reshape(data, (2, 3)), [0, 0, 1]))).flat
+        a, b, c, d, e, f, _, _, _ = np.linalg.inv(
+            np.vstack((np.reshape(data, (2, 3)), [0, 0, 1]))
+        ).flat
         x, y = point
         x += 0.5
         y += 0.5
-        return a*x + b*y + c - 0.5, d*x + e*y + f - 0.5
-    return np.array(PIL.Image.fromarray(img).transform(size, PIL.Image.AFFINE, data, interpolation))
+        return a * x + b * y + c - 0.5, d * x + e * y + f - 0.5
+    return np.array(
+        PIL.Image.fromarray(img).transform(size, PIL.Image.AFFINE, data, interpolation)
+    )
+
 
 def ptpscale(img):
     """
@@ -118,6 +130,7 @@ def imshow(img):
     """
     view(img, pause=True)
 
+
 def imshowsc(img):
     """
     Rescales (and translates) the intensities of the image *img* to cover the 0..255 range.
@@ -125,13 +138,15 @@ def imshowsc(img):
     """
     view(img, scale=True, pause=True)
 
+
 class ImageDirOut(object):
     """
     Creates a directory called *dirname* for storing a sequence of images in the format
     specified by *format*. If *append* is not *True* (default) the content of the directory
     will be cleard if it excists.
     """
-    def __init__(self, dirname, format='jpg', append=False):
+
+    def __init__(self, dirname, format="jpg", append=False):
         self.dirname = dirname
         self.format = format
         self.fcnt = 0
@@ -148,7 +163,11 @@ class ImageDirOut(object):
         Save the image *img* as *dirname/xxxxxxxx.format* where *xxxxxxxx* is an 8 digit
         sequence number.
         """
-        imsave(img, os.path.join(self.dirname, '%.8d.%s' % (self.fcnt, self.format)), self.format)
+        imsave(
+            img,
+            os.path.join(self.dirname, "%.8d.%s" % (self.fcnt, self.format)),
+            self.format,
+        )
         self.fcnt += 1
 
     def viewsc(self, img):
@@ -157,6 +176,7 @@ class ImageDirOut(object):
         :py:meth:`~vi3o.image.ImageDirOut.view` to save it.
         """
         self.view(ptpscale(img))
+
 
 imview = imshow
 imviewsc = imshowsc

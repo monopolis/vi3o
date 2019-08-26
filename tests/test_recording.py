@@ -49,8 +49,6 @@ _BLOCK_DATA = (
 )
 
 
-
-
 # Note that normally only one type of block exists in a recording
 _BLOCK_XML_FN_A = "derp.xml"
 _BLOCK_MKV_FN_A = "derp.mkv"

@@ -4,7 +4,8 @@ import os
 mydir = os.path.abspath(os.path.dirname(__file__))
 
 ffi = FFI()
-ffi.cdef("""
+ffi.cdef(
+    """
         struct mkv {
             int width, height;
             char mac[13];
@@ -33,12 +34,16 @@ ffi.cdef("""
         int decode_frame(struct decode *p, struct mkv_frame *frm, uint8_t *img, uint64_t *ts, int grey);
         int64_t mkv_estimate_systime_offset(struct mkv *s);
 
-         """)
-ffi.set_source("vi3o._mkv", '#include "decode.h"',
-               include_dirs=[mydir],
-               sources=[os.path.join(mydir, "mkv.c"), os.path.join(mydir,"decode.c")],
-               # cflags=["-g"],
-               libraries=["avcodec", "swscale"])
+         """
+)
+ffi.set_source(
+    "vi3o._mkv",
+    '#include "decode.h"',
+    include_dirs=[mydir],
+    sources=[os.path.join(mydir, "mkv.c"), os.path.join(mydir, "decode.c")],
+    # cflags=["-g"],
+    libraries=["avcodec", "swscale"],
+)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ffi.compile()

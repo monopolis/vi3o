@@ -37,19 +37,29 @@ class SyncedVideos(object):
 
 
     """
+
     def __init__(self, *filenames_or_videos):
-        self.videos = [Video(v) if isinstance(v, str) else v for v in filenames_or_videos]
+        self.videos = [
+            Video(v) if isinstance(v, str) else v for v in filenames_or_videos
+        ]
         start = max([v[0].systime for v in self.videos])
         times = [TimedIter(v.systimes) for v in self.videos]
         frames = [v.next_timed(start) for v in times]
         self.start_systime = sum([f[1] for f in frames]) / len(frames)
         self.start_index = [f[0] for f in frames]
-        self.intervall = max([(v[-1].systime - v[0].systime) / len(v) for v in self.videos])
+        self.intervall = max(
+            [(v[-1].systime - v[0].systime) / len(v) for v in self.videos]
+        )
         self._systimes = None
         self._indexes = None
 
     def __iter__(self):
-        return SyncVideoIter(self.videos, self.start_index, self.start_systime - self.intervall, self.intervall)
+        return SyncVideoIter(
+            self.videos,
+            self.start_index,
+            self.start_systime - self.intervall,
+            self.intervall,
+        )
 
     def _calc_index_times(self):
         times = [TimedIter(v.systimes) for v in self.videos]
@@ -90,15 +100,19 @@ class SyncedVideos(object):
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            return SlicedView(self, item, {'systimes': self._sliced_systimes,
-                                           'indexes': self._sliced_indexes})
-        if (item < 0):
+            return SlicedView(
+                self,
+                item,
+                {"systimes": self._sliced_systimes, "indexes": self._sliced_indexes},
+            )
+        if item < 0:
             item += len(self)
         idx = self.indexes[item]
         return [v[i] for i, v in zip(idx, self.videos)]
 
     def __len__(self):
         return len(self.indexes)
+
 
 class TimedIter(object):
     def __init__(self, systimes):
@@ -107,11 +121,17 @@ class TimedIter(object):
 
     def next_timed(self, systime):
         if self.systimes[self.prev] < systime:
-            while not (self.systimes[self.prev] <= systime <= self.systimes[self.prev+1]):
+            while not (
+                self.systimes[self.prev] <= systime <= self.systimes[self.prev + 1]
+            ):
                 self.prev += 1
-            if systime - self.systimes[self.prev] > self.systimes[self.prev + 1] - systime:
+            if (
+                systime - self.systimes[self.prev]
+                > self.systimes[self.prev + 1] - systime
+            ):
                 self.prev += 1
         return (self.prev, self.systimes[self.prev])
+
 
 class TimedVideoIter(object):
     def __init__(self, video):
@@ -133,9 +153,10 @@ class TimedVideoIter(object):
             self.prev = img
             return p
 
+
 class SyncVideoIter(object):
     def __init__(self, videos, start_index, start_systime, intervall):
-        self.videos = [TimedVideoIter(v[i:]) for v,i in zip(videos, start_index)]
+        self.videos = [TimedVideoIter(v[i:]) for v, i in zip(videos, start_index)]
         self.systime = start_systime
         self.intervall = intervall
 
@@ -145,7 +166,6 @@ class SyncVideoIter(object):
 
     def __iter__(self):
         return self
-
 
     def __next__(self):
         return self.next()

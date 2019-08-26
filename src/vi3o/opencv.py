@@ -9,9 +9,10 @@ from vi3o.utils import Frame, SlicedView
 import os
 import numpy as np
 
-for attr in ('CAP_PROP_FRAME_COUNT', 'CAP_PROP_POS_FRAMES', 'CAP_PROP_POS_MSEC'):
+for attr in ("CAP_PROP_FRAME_COUNT", "CAP_PROP_POS_FRAMES", "CAP_PROP_POS_MSEC"):
     if not hasattr(cv2, attr):
-        setattr(cv2, attr, getattr(cv2.cv, 'CV_' + attr))
+        setattr(cv2, attr, getattr(cv2.cv, "CV_" + attr))
+
 
 class CvVideo(object):
     def __init__(self, filename, grey=False):
@@ -41,7 +42,6 @@ class CvVideo(object):
         img.timestamp = timestamp
         return img
 
-
     def __iter__(self):
         return self
 
@@ -53,6 +53,7 @@ class CvVideo(object):
 
     def __del__(self):
         self.capture.release()
+
 
 class CvOut(object):
     """
@@ -71,18 +72,19 @@ class CvOut(object):
             ...
 
     """
+
     def __init__(self, filename, fps=25):
         self.filename = filename
         self.video = None
         self.fps = fps
 
     def view(self, img, scale=False):
-        if img.dtype == 'bool':
-            img = img.astype('B')
+        if img.dtype == "bool":
+            img = img.astype("B")
         if scale:
             img = ptpscale(img)
-        if img.dtype != 'B':
-            img = np.minimum(np.maximum(img, 0), 255).astype('B')
+        if img.dtype != "B":
+            img = np.minimum(np.maximum(img, 0), 255).astype("B")
 
         if len(img.shape) == 2:
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
@@ -91,8 +93,14 @@ class CvOut(object):
 
         if self.video is None:
             height, width, _ = img.shape
-            for codec in [875967048, 1482049860, -1]: #[cv2.cv.FOURCC(*"H264"), cv2.cv.FOURCC(*"DIVX"), -1]:
-                self.video = cv2.VideoWriter(self.filename, codec, self.fps, (width, height))
+            for codec in [
+                875967048,
+                1482049860,
+                -1,
+            ]:  # [cv2.cv.FOURCC(*"H264"), cv2.cv.FOURCC(*"DIVX"), -1]:
+                self.video = cv2.VideoWriter(
+                    self.filename, codec, self.fps, (width, height)
+                )
                 if self.video.isOpened():
                     break
         self.video.write(img)
@@ -108,8 +116,10 @@ class CvOut(object):
             self.video.release()
         self.video = None
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import numpy as np
+
     avi = CvOut("/tmp/t.avi")
     for i in range(100):
         avi.view(np.zeros((480, 640, 3)))

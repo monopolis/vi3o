@@ -2,7 +2,7 @@ import os
 from vi3o import SyncedVideos
 
 mydir = os.path.dirname(__file__)
-test_mkvs = [os.path.join(mydir, f) for f in ['a.mkv', 'b.mkv', 'c.mkv']]
+test_mkvs = [os.path.join(mydir, f) for f in ["a.mkv", "b.mkv", "c.mkv"]]
 
 
 def test_sync():
@@ -27,10 +27,9 @@ def test_sync():
         assert systimes[i] == (a.systime, b.systime, c.systime)
 
     skip50 = videos[50:]
-    for i in range(104-50):
+    for i in range(104 - 50):
         a, b, c = skip50[i]
-        assert systimes[i+50] == (a.systime, b.systime, c.systime)
-
+        assert systimes[i + 50] == (a.systime, b.systime, c.systime)
 
     last10 = videos[-10:]
     for i in range(10):
@@ -41,4 +40,3 @@ def test_sync():
 
     assert last10.systimes == systimes[-10:]
     assert last10.indexes == videos.indexes[-10:]
-

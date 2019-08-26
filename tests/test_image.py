@@ -11,7 +11,7 @@ test_jpg2 = os.path.join(mydir, "img00012680.jpg")
 
 def test_save_load():
     with TempDir() as d:
-        img = np.zeros((320, 240, 3), 'B')
+        img = np.zeros((320, 240, 3), "B")
         img[10, 20] = 255
         imsave(img, os.path.join(d, "t1.jpg"), "jpg")
         imsave(img, os.path.join(d, "t2.png"))
@@ -29,18 +29,20 @@ def test_save_load():
         assert all(im3[30, 40] == 0)
         assert all(im3[1, 2] == 127)
 
+
 def test_scale():
-    img = np.zeros((240, 320, 3), 'B')
+    img = np.zeros((240, 320, 3), "B")
     assert imscale(img, 2).shape == (480, 640, 3)
     assert imscale(img, (640, 480)).shape == (480, 640, 3)
 
-    img = np.zeros((240, 320), 'B')
+    img = np.zeros((240, 320), "B")
     assert imscale(img, 0.5).shape == (120, 160)
     assert imscale(img, (160, 120)).shape == (120, 160)
 
+
 def test_imsave_and_imread_pathlib():
     with TempDir() as d:
-        img = np.zeros((320, 240, 3), 'B')
+        img = np.zeros((320, 240, 3), "B")
         img[10, 20] = 255
         path = pathlib.Path("t1.jpg")
         imsave(img, path, "jpg")
@@ -49,7 +51,7 @@ def test_imsave_and_imread_pathlib():
 
 def test_imgdir():
     with TempDir() as d:
-        img = np.zeros((320, 240, 3), 'B')
+        img = np.zeros((320, 240, 3), "B")
         out = ImageDirOut(d)
         out.view(img)
         out.view(img)
@@ -66,15 +68,16 @@ def test_imgdir():
         out.view(img)
         assert len(os.listdir(d)) == 4
 
+
 def test_imrotate():
-    img = np.ones([12, 16], 'B') * 255
+    img = np.ones([12, 16], "B") * 255
     # FIXME: Improve test by adding:
     # img[1, :] = img[10, :] = np.array(range(16)) * 10
     # img[:, 1] = img[:, 14] = np.array(range(12)) * 10
     img[0, :] = img[11, :] = 0
     img[:, 0] = img[:, 15] = 0
 
-    rot = imrotate(img, 1.5708/2, [16, 0], [16*2, 12*2], NEAREST)
+    rot = imrotate(img, 1.5708 / 2, [16, 0], [16 * 2, 12 * 2], NEAREST)
     # imwrite(rot, "/tmp/t.png")
     # os.system("xzgv /tmp/t.png")
 
@@ -84,9 +87,11 @@ def test_imrotate():
     cnt1 = cnt2 = 0
     for y in range(-12, 24):
         for x in range(-16, 32):
-            rx, ry = imrotate(img, 1.5708/2, [16, 0], [16 * 2, 12 * 2], NEAREST, point=[x, y])
+            rx, ry = imrotate(
+                img, 1.5708 / 2, [16, 0], [16 * 2, 12 * 2], NEAREST, point=[x, y]
+            )
             rx, ry = int(round(rx)), int(round(ry))
-            if 0 < rx < 16*2 and 0 < ry < 12*2:
+            if 0 < rx < 16 * 2 and 0 < ry < 12 * 2:
                 if 0 <= x < 16 and 0 <= y < 12:
                     assert rot[ry, rx] == img[y, x]
                     cnt1 += 1
@@ -97,6 +102,7 @@ def test_imrotate():
     assert cnt2 > 10
 
     assert all(rot[:12].flat == 0)
+
 
 def test_imread():
     img = imread(test_jpg)

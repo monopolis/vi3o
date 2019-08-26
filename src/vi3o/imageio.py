@@ -2,6 +2,7 @@ from __future__ import division
 import imageio, os
 from vi3o.utils import SlicedView
 
+
 class ImageioVideo(object):
     def __init__(self, filename, grey=False):
         if not os.path.exists(filename):
@@ -11,8 +12,8 @@ class ImageioVideo(object):
         try:
             self.reader = imageio.get_reader(filename)
         except ValueError:
-            self.reader = imageio.get_reader(filename, 'ffmpeg')
-        self.fps = self.reader.get_meta_data()['fps']
+            self.reader = imageio.get_reader(filename, "ffmpeg")
+        self.fps = self.reader.get_meta_data()["fps"]
 
     def __len__(self):
         return len(self.reader)

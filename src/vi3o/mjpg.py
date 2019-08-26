@@ -8,14 +8,16 @@ import os, sys
 from vi3o.utils import SlicedView, index_file, Frame
 from vi3o._mjpg import ffi, lib
 
+
 class Mjpg(object):
     """
     If a filename that ends with .mjpg is passed to :func:`vi3o.Video` this kind of object
     is returned. It has a few additional format specific properties:
     """
+
     def __init__(self, filename, grey=False):
         # Be compatible with pathlib.Path filenames
-        filename = str(filename).encode('utf-8')
+        filename = str(filename).encode("utf-8")
         self.filename = filename
         self.grey = grey
         open(filename).close()
@@ -38,8 +40,10 @@ class Mjpg(object):
             if os.path.exists(idx):
                 self._index = json.load(open(idx))
             else:
-                self._index = [self.myiter.m.start_position_in_file for img in self.myiter]
-                with open(idx, 'w') as fd:
+                self._index = [
+                    self.myiter.m.start_position_in_file for img in self.myiter
+                ]
+                with open(idx, "w") as fd:
                     json.dump(self._index, fd)
         return self._index
 
@@ -52,8 +56,8 @@ class Mjpg(object):
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            return SlicedView(self, item, {'systimes': self._sliced_systimes})
-        if (item < 0):
+            return SlicedView(self, item, {"systimes": self._sliced_systimes})
+        if item < 0:
             item += len(self)
         lib.mjpg_seek(self.myiter.m, self.offset[item])
         self.myiter.fcnt = item
@@ -92,7 +96,9 @@ class MjpgIter(object):
         self.m = ffi.new("struct mjpg *")
         self.fcnt = 0
         if grey:
-            r = lib.mjpg_open(self.m, filename, lib.IMTYPE_GRAY, lib.IMORDER_INTERLEAVED)
+            r = lib.mjpg_open(
+                self.m, filename, lib.IMTYPE_GRAY, lib.IMORDER_INTERLEAVED
+            )
             self.channels = 1
         else:
             r = lib.mjpg_open(self.m, filename, lib.IMTYPE_RGB, lib.IMORDER_INTERLEAVED)
@@ -111,9 +117,9 @@ class MjpgIter(object):
             shape = (self.m.height, self.m.width)
         else:
             shape = (self.m.height, self.m.width, self.channels)
-        img = Frame(shape, 'B')
-        assert img.__array_interface__['strides'] is None
-        self.m.pixels = ffi.cast('unsigned char *', img.__array_interface__['data'][0])
+        img = Frame(shape, "B")
+        assert img.__array_interface__["strides"] is None
+        self.m.pixels = ffi.cast("unsigned char *", img.__array_interface__["data"][0])
 
         r = lib.mjpg_next_data(self.m)
         if r != lib.OK:
@@ -132,6 +138,7 @@ class MjpgIter(object):
     def __del__(self):
         lib.mjpg_close(self.m)
 
+
 def jpg_info(filename):
     """
     Reads a single jpeg image from the file *filename* and extracts the Axis user data header.
@@ -143,12 +150,11 @@ def jpg_info(filename):
     m = ffi.new("struct mjpg *")
     r = lib.mjpg_open(m, filename, lib.IMTYPE_GRAY, lib.IMORDER_PLANAR)
     lib.mjpg_next_head(m)
-    res = {'hwid': ffi.string(m.hwid),
-           'serial_number': ffi.string(m.serial),
-           'firmware_version': ffi.string(m.firmware),
-           'timestamp': m.timestamp_sec + m.timestamp_usec / 1000000.0}
+    res = {
+        "hwid": ffi.string(m.hwid),
+        "serial_number": ffi.string(m.serial),
+        "firmware_version": ffi.string(m.firmware),
+        "timestamp": m.timestamp_sec + m.timestamp_usec / 1000000.0,
+    }
     lib.mjpg_close(m)
     return res
-
-
-

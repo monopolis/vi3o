@@ -10,7 +10,6 @@ from vi3o import cat
 from tests.util import _FakeVideo, itertools, mock
 
 
-
 _LENGTHS = [5, 7, 3]
 _BASE_OFFSET = 15
 
@@ -24,7 +23,6 @@ _EXPECTED_SYSTIMES = [_BASE_OFFSET + x for x in range(sum(_LENGTHS))]
 
 # Timestamps should be sequential with 0 offset
 _EXPECTED_TIMESTAMPS = [x for x in range(sum(_LENGTHS))]
-
 
 
 @pytest.fixture(scope="function")

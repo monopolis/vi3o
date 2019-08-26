@@ -20,11 +20,13 @@ else:
 
     itertools.accumulate = _accumulate
 
+
 @contextmanager
 def TempDir():
     temp_dir = tempfile.mkdtemp()
     yield temp_dir
     shutil.rmtree(temp_dir)
+
 
 class _FakeVideo:
     def __init__(self, length):

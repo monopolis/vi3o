@@ -4,7 +4,8 @@ import os
 mydir = os.path.abspath(os.path.dirname(__file__))
 
 ffi = FFI()
-ffi.cdef("""
+ffi.cdef(
+    """
         struct mjpg {
             int width, height;
             unsigned char *pixels;
@@ -29,12 +30,15 @@ ffi.cdef("""
         int mjpg_close(struct mjpg *m);
         int mjpg_seek (struct mjpg *m, long offset);
 
-         """)
-ffi.set_source("vi3o._mjpg", '#include "mjpg.h"',
-               include_dirs=[mydir],
-               sources=[os.path.join(mydir, "mjpg.c")],
-               libraries=["jpeg"], )
+         """
+)
+ffi.set_source(
+    "vi3o._mjpg",
+    '#include "mjpg.h"',
+    include_dirs=[mydir],
+    sources=[os.path.join(mydir, "mjpg.c")],
+    libraries=["jpeg"],
+)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ffi.compile()
-

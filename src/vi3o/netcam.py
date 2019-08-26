@@ -27,17 +27,26 @@ class AxisCam(object):
     and any other keyword parameter will be passed on to the camera as a VAPIX
     parameter.
     """
-    def __init__(self, ip, width=None, height=None, username=None, password=None, no_proxy=False, **kwargs):
 
+    def __init__(
+        self,
+        ip,
+        width=None,
+        height=None,
+        username=None,
+        password=None,
+        no_proxy=False,
+        **kwargs
+    ):
 
         if no_proxy:
-            os.environ['NO_PROXY'] = ip
-            os.environ['no_proxy'] = ip
-        mjpg_url = 'http://' + ip + '/mjpg/video.mjpg'
+            os.environ["NO_PROXY"] = ip
+            os.environ["no_proxy"] = ip
+        mjpg_url = "http://" + ip + "/mjpg/video.mjpg"
         if width is not None:
-            mjpg_url += '?resolution=%dx%d' % (width, height)
+            mjpg_url += "?resolution=%dx%d" % (width, height)
         for k, v in kwargs.items():
-            mjpg_url += '&%s=%s' % (k, v)
+            mjpg_url += "&%s=%s" % (k, v)
 
         r = requests.get(mjpg_url, auth=HTTPDigestAuth(username, password), stream=True)
         r.raise_for_status()
@@ -59,18 +68,20 @@ class AxisCam(object):
                 raise StopIteration
             if not l.strip() and headers:
                 break
-            if b':' in l:
-                i = l.index(b':')
-                headers[l[:i]] = l[i+1:].strip()
+            if b":" in l:
+                i = l.index(b":")
+                headers[l[:i]] = l[i + 1 :].strip()
 
-        data = self._fd.read(int(headers[b'Content-Length']))
+        data = self._fd.read(int(headers[b"Content-Length"]))
         img = imread(StringIO(data)).view(Frame)
         img.index = self.fcnt
         self.fcnt += 1
-        img.timestamp = img.systime = -1 # FIXME
+        img.timestamp = img.systime = -1  # FIXME
         return img
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     from vi3o import view
+
     for img in AxisCam("192.168.0.90", username="root", password="pass", no_proxy=True):
         view(img)

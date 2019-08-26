@@ -4,8 +4,10 @@ import numpy as np
 if sys.version_info > (3,):
     xrange = range
 
+
 class Frame(np.ndarray):
     pass
+
 
 class SlicedView(object):
     def __init__(self, parent, indexes, properties=()):
@@ -26,7 +28,7 @@ class SlicedView(object):
 
     def __getstate__(self):
         state = dict(self.__dict__)
-        del state['properties'] # FIXME
+        del state["properties"]  # FIXME
         return state
 
     def __setstate__(self, state):
@@ -34,13 +36,14 @@ class SlicedView(object):
         self.properties = ()
 
 
-cache_dir = os.path.join(os.path.expanduser('~'), ".cache", "vi3o")
+cache_dir = os.path.join(os.path.expanduser("~"), ".cache", "vi3o")
+
 
 def index_file(fn, extradata=None):
     stats = os.stat(fn)
     key = str((os.path.abspath(fn), stats.st_size, stats.st_mtime, extradata))
     key = hashlib.md5(key.encode()).hexdigest()
-    path = os.path.join(cache_dir, key + '.idx')
+    path = os.path.join(cache_dir, key + ".idx")
     d = os.path.dirname(path)
     if not os.path.exists(d):
         os.makedirs(d)
