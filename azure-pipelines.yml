@@ -1,0 +1,53 @@
+trigger:
+- bring-order-to-vi3o
+
+
+jobs:
+- job: check_prerequisites
+  displayName: Check prerequisites
+  pool:
+    vmimage: 'ubuntu-latest'
+  strategy:
+    matrix:
+        format:
+            TASK: 'format'
+        lint:
+            TASK: 'lint'
+        docs:
+            TASK: 'docs'
+    maxParallel: 3
+  steps:
+    - script: docker build -t debian:stretch -f ci/debian:stretch.dockerfile .
+      displayName: Build image
+    - script: docker run --rm debian:stretch -e $(TASK)
+      displayName: Check $(TASK)
+  
+- job: build_on_platforms
+  displayName: Build on platform
+  pool:
+    vmImage: 'ubuntu-latest'
+  strategy:
+    matrix:
+      debian_8:
+        NAME: 'debian:jessie'
+      debian_9:
+        NAME: 'debian:stretch'
+      #debian_10
+      #  NAME: 'debian:buster'
+      ubuntu_14_04:
+        NAME: 'ubuntu:trusty'
+      ubuntu_16_04:
+        NAME: 'ubuntu:xenial'
+      # ubuntu_18.04:
+      #   NAME: 'ubuntu:bionic'
+    maxParallel: 6
+  steps: 
+    - script: docker build -t $(NAME) -f ci/$(NAME).dockerfile .
+      displayName: Build image for $(NAME)
+    - script: docker run --rm $(NAME)
+      displayName: Run tests for $(NAME)
+
+
+
+
+
